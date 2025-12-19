@@ -541,9 +541,17 @@ class Core:
             if res:
                 # Use path from gcc-config
                 libgccPath = res[0] + "/" + libgccFilenameMain
-                Tools.SafeCopy(libgccPath, var.GetTempLib64Dir())
-                os.chdir(var.GetTempLib64Dir())
-                os.symlink(libgccFilenameMain, libgccFilename)
+                targetLibgcc = var.GetTempLib64Dir() + "/" + libgccFilenameMain
+                targetSymlink = var.GetTempLib64Dir() + "/" + libgccFilename
+
+                # Only copy if not already present (may have been copied as a dependency)
+                if not os.path.exists(targetLibgcc):
+                    Tools.SafeCopy(libgccPath, var.GetTempLib64Dir())
+
+                # Create symlink if it doesn't exist
+                if not os.path.exists(targetSymlink):
+                    os.chdir(var.GetTempLib64Dir())
+                    os.symlink(libgccFilenameMain, libgccFilename)
                 return
 
         # Doing a 'whereis <name of libgcc library>' will not work because it seems
