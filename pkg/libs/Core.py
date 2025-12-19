@@ -425,6 +425,13 @@ class Core:
         if os.path.isdir(udev_lib_dir):
             shutil.copytree(udev_lib_dir, temp_udev_lib_dir)
 
+        # Create symlink for systemd-udevd 255+ which looks in /usr/lib/udev
+        usr_lib_dir = var.temp + "/usr/lib"
+        os.makedirs(usr_lib_dir, exist_ok=True)
+        usr_lib_udev = usr_lib_dir + "/udev"
+        if not os.path.exists(usr_lib_udev):
+            os.symlink("../../lib/udev", usr_lib_udev)
+
         # Rename udevd and place in /sbin
         udev_provider = Base.GetUdevProvider()
         systemd_dir = os.path.dirname(udev_provider)
